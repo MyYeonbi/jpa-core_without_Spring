@@ -46,7 +46,7 @@ public class EntityStateTest {
   }
 
 
-  
+
   @Test
   @DisplayName("준영속 상태 : detach()")
   void test2() {
@@ -152,6 +152,40 @@ public class EntityStateTest {
       em.close();
       Memo memo = em.find(Memo.class, 2); // Session/EntityManager is closed 메시지와 함께 오류 발생
       System.out.println("memo.getId() = " + memo.getId());
+
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      et.rollback();
+    } finally {
+      em.close();
+    }
+
+    emf.close();
+  }
+
+  @Test
+  @DisplayName("merge() : 저장")
+  void test5() {
+    EntityTransaction et = em.getTransaction();
+
+    et.begin();
+
+    try {
+
+      Memo memo = new Memo();
+      memo.setId(3L);
+      memo.setUsername("merge()");
+      memo.setContents("merge() 저장");
+
+      System.out.println("merge() 호출");
+      Memo mergedMemo = em.merge(memo);
+
+      System.out.println("em.contains(memo) = " + em.contains(memo));
+      System.out.println("em.contains(mergedMemo) = " + em.contains(mergedMemo));
+
+      System.out.println("트랜잭션 commit 전");
+      et.commit();
+      System.out.println("트랜잭션 commit 후");
 
     } catch (Exception ex) {
       ex.printStackTrace();
